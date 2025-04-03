@@ -59,9 +59,9 @@ export const useChat = () => {
           'Content-Type': 'application/json',
         };
 
-        // Add auth header if password is set
+        // Add auth header if password is set - Using "pw" header instead of "Authorization"
         if (settings.authPassword) {
-          headers['Authorization'] = `Bearer ${settings.authPassword}`;
+          headers['pw'] = settings.authPassword;
         }
 
         // Send message to API
