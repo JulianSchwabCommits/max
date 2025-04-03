@@ -83,11 +83,21 @@ export const useChat = () => {
 
         const data = await response.json();
         
+        // Handle the response format: [{"output": "response text"}]
+        let responseText = 'Sorry, I received an empty response.';
+        
+        if (Array.isArray(data) && data.length > 0 && data[0].output) {
+          responseText = data[0].output;
+        } else if (data.response) {
+          // Fallback to previous format if it exists
+          responseText = data.response;
+        }
+
         // Create assistant message
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: data.response || 'Sorry, I received an empty response.',
+          content: responseText,
           timestamp: new Date(),
         };
 
