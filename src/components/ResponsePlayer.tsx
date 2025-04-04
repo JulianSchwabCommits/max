@@ -27,16 +27,16 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
 
     setIsFetching(true);
     try {
-      const response = await fetch('https://api.openai.com/v1/audio/tts', {
+      const response = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${openaiApiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini-tts',
-          input: responseText,
-          voice: 'alloy'
+          model: 'tts-1',
+          voice: 'alloy',
+          input: responseText
         })
       });
 
@@ -85,7 +85,7 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
   return (
     <div className="flex flex-col items-center space-y-4 w-full max-w-md">
       <div className="w-full px-4 py-2 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
-        <p className="text-max-light-grey text-center">{responseText}</p>
+        <div className="text-max-light-grey markdown-content" dangerouslySetInnerHTML={{ __html: responseText }} />
       </div>
 
       {audioUrl && (

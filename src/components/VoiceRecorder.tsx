@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/SettingsContext';
 import { toast } from 'sonner';
+import { marked } from 'marked';
 
 interface VoiceRecorderProps {
   onResponseReceived: (response: string) => void;
@@ -134,7 +135,9 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
       }
       
       const responseData = await response.text();
-      onResponseReceived(responseData);
+      // Convert the response to HTML using marked
+      const formattedResponse = marked(responseData);
+      onResponseReceived(formattedResponse);
     } catch (error) {
       console.error('Error sending transcription:', error);
       toast.error('Error sending your message. Please check your settings and try again.');
