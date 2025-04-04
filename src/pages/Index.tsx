@@ -1,13 +1,39 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React, { useState } from 'react';
+import VoiceRecorder from '@/components/VoiceRecorder';
+import ResponsePlayer from '@/components/ResponsePlayer';
+import SettingsPanel from '@/components/SettingsPanel';
+import Welcome from '@/components/Welcome';
+import { SettingsProvider } from '@/contexts/SettingsContext';
+
+const Index: React.FC = () => {
+  const [response, setResponse] = useState<string>('');
+  const [started, setStarted] = useState(false);
+
+  const handleResponseReceived = (responseText: string) => {
+    setResponse(responseText);
+  };
+
+  const handleStart = () => {
+    setStarted(true);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <SettingsProvider>
+      <div className="min-h-screen bg-max-dark-grey flex flex-col items-center justify-center p-4 relative">
+        <SettingsPanel />
+        
+        {!started ? (
+          <Welcome onStart={handleStart} />
+        ) : (
+          <div className="flex flex-col items-center justify-center space-y-12 w-full max-w-md">
+            <VoiceRecorder onResponseReceived={handleResponseReceived} />
+            
+            {response && <ResponsePlayer responseText={response} />}
+          </div>
+        )}
       </div>
-    </div>
+    </SettingsProvider>
   );
 };
 
