@@ -27,6 +27,11 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
 
     setIsFetching(true);
     try {
+      // Extract pure text content from the HTML for speech
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = responseText;
+      const textContent = tempDiv.textContent || '';
+      
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
         headers: {
@@ -34,9 +39,9 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
           'Authorization': `Bearer ${openaiApiKey}`
         },
         body: JSON.stringify({
-          model: 'tts-1',
-          voice: 'alloy',
-          input: responseText
+          model: "gpt-4o-mini-tts",
+          voice: "alloy",
+          input: textContent
         })
       });
 
@@ -99,15 +104,16 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
           >
             {isPlaying ? <Square size={16} /> : <Play size={16} />}
           </Button>
-          <Button 
-            variant="outline"
-            size="icon"
-            onClick={stopPlayback}
-            disabled={!isPlaying}
-            className="bg-max-light-grey hover:bg-gray-300 text-black"
-          >
-            <Square size={16} />
-          </Button>
+          {isPlaying && (
+            <Button 
+              variant="outline"
+              size="icon"
+              onClick={stopPlayback}
+              className="bg-max-light-grey hover:bg-gray-300 text-black"
+            >
+              <Square size={16} />
+            </Button>
+          )}
         </div>
       )}
 
