@@ -180,7 +180,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
           isRecording
             ? "bg-red-500 animate-pulse-gentle"
             : isProcessing
-              ? "bg-max-yellow animate-pulse-ring"
+              ? "bg-max-yellow animate-circle-wave"
               : "bg-max-yellow hover:bg-yellow-400"
         )}
         onMouseDown={!isProcessing ? handleCircleMouseDown : undefined}
@@ -192,13 +192,27 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
         {isRecording ? (
           <MicOff className="w-16 h-16 text-white" />
         ) : isProcessing ? (
-          <div className="relative">
-            <Loader2 className="w-16 h-16 text-white animate-spin" />
+          <div className="flex flex-col items-center">
+            {/* Sound wave animation inspired by ChatGPT and ElevenLabs */}
+            <div className="sound-waves">
+              <div className="sound-wave-bar"></div>
+              <div className="sound-wave-bar"></div>
+              <div className="sound-wave-bar"></div>
+              <div className="sound-wave-bar"></div>
+              <div className="sound-wave-bar"></div>
+            </div>
           </div>
         ) : (
           <Mic className="w-16 h-16 text-white" />
         )}
       </div>
+
+      {/* Processing indicator outside the circle */}
+      {isProcessing && (
+        <div className="text-max-light-grey text-center text-lg animate-wave">
+          Processing request...
+        </div>
+      )}
 
       {/* Transcription display */}
       {(transcription || isTranscribing) && (
@@ -218,12 +232,6 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
         >
           <Send className="mr-2 h-5 w-5" /> Send
         </Button>
-      )}
-
-      {isProcessing && (
-        <div className="text-max-light-grey text-center text-lg">
-          Processing request...
-        </div>
       )}
     </div>
   );

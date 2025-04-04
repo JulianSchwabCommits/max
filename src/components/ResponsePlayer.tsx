@@ -14,10 +14,16 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [displayHtml, setDisplayHtml] = useState<string>('');
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (responseText) {
+      // Process the markdown for display
+      const html = marked.parse(responseText) as string;
+      setDisplayHtml(html);
+
+      // Fetch the audio response
       fetchAudioResponse();
     }
   }, [responseText]);
@@ -27,9 +33,19 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
 
     setIsFetching(true);
     try {
-      // Extract pure text content from the HTML for speech
+      // Extract pure text content from the HTML for speech, handling links properly
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = responseText;
+      tempDiv.innerHTML = marked.parse(responseText) as string;
+
+      // Replace all links with just their text content for TTS
+      const links = tempDiv.querySelectorAll('a');
+      links.forEach(link => {
+        // Store the link text (or "here" if there's no text)
+        const linkText = link.textContent?.trim() || 'here';
+        // Replace the link with just the text
+        link.outerHTML = linkText;
+      });
+
       const textContent = tempDiv.textContent || '';
 
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
@@ -90,7 +106,7 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
   return (
     <div className="flex flex-col items-center space-y-4 w-full max-w-2xl">
       <div className="w-full px-6 py-4 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
-        <div className="text-max-light-grey markdown-content" dangerouslySetInnerHTML={{ __html: marked.parse(responseText) as string }} />
+        <div className="text-max-light-grey markdown-content" dangerouslySetInnerHTML={{ __html: displayHtml }} />
       </div>
 
       {audioUrl && (
