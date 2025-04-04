@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface SettingsContextType {
@@ -34,6 +34,19 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [authPassword, setAuthPasswordState] = useState('');
   const [sessionMode, setSessionModeState] = useState<'classic' | 'guided'>('classic');
 
+  // Load saved settings on mount
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('openaiApiKey') || '';
+    const savedRequestUrl = localStorage.getItem('requestUrl') || '';
+    const savedAuthPassword = localStorage.getItem('authPassword') || '';
+    const savedSessionMode = localStorage.getItem('sessionMode') as 'classic' | 'guided' || 'classic';
+
+    setOpenaiApiKeyState(savedApiKey);
+    setRequestUrlState(savedRequestUrl);
+    setAuthPasswordState(savedAuthPassword);
+    setSessionModeState(savedSessionMode);
+  }, []);
+
   const setOpenaiApiKey = (key: string) => {
     setOpenaiApiKeyState(key);
     localStorage.setItem('openaiApiKey', key);
@@ -56,19 +69,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     setSessionModeState(mode);
     localStorage.setItem('sessionMode', mode);
   };
-
-  // Load saved settings on mount
-  React.useEffect(() => {
-    const savedApiKey = localStorage.getItem('openaiApiKey') || '';
-    const savedRequestUrl = localStorage.getItem('requestUrl') || '';
-    const savedAuthPassword = localStorage.getItem('authPassword') || '';
-    const savedSessionMode = localStorage.getItem('sessionMode') as 'classic' | 'guided' || 'classic';
-
-    setOpenaiApiKeyState(savedApiKey);
-    setRequestUrlState(savedRequestUrl);
-    setAuthPasswordState(savedAuthPassword);
-    setSessionModeState(savedSessionMode);
-  }, []);
 
   const isSettingsComplete = Boolean(openaiApiKey && requestUrl && authPassword);
 

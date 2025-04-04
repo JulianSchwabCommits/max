@@ -122,7 +122,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Auth': `pw: ${authPassword}`
+          'pw': authPassword
         },
         body: JSON.stringify({
           message: transcription
