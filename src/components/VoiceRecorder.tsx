@@ -135,9 +135,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
       }
       
       const responseData = await response.text();
-      // Process the Markdown with marked synchronously
-      const formattedResponse = marked.parse(responseData);
-      // Now formattedResponse is a string, not a Promise
+      
+      // Fix TypeScript error by using marked.parse as a synchronous function
+      const formattedResponse = marked.parse(responseData) as string;
+      
       onResponseReceived(formattedResponse);
     } catch (error) {
       console.error('Error sending transcription:', error);
