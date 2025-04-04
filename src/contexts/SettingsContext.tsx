@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -6,11 +5,9 @@ interface SettingsContextType {
   openaiApiKey: string;
   requestUrl: string;
   authPassword: string;
-  sessionMode: 'classic' | 'guided';
   setOpenaiApiKey: (key: string) => void;
   setRequestUrl: (url: string) => void;
   setAuthPassword: (password: string) => void;
-  setSessionMode: (mode: 'classic' | 'guided') => void;
   isSettingsComplete: boolean;
 }
 
@@ -32,19 +29,16 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [openaiApiKey, setOpenaiApiKeyState] = useState('');
   const [requestUrl, setRequestUrlState] = useState('');
   const [authPassword, setAuthPasswordState] = useState('');
-  const [sessionMode, setSessionModeState] = useState<'classic' | 'guided'>('classic');
 
   // Load saved settings on mount
   useEffect(() => {
     const savedApiKey = localStorage.getItem('openaiApiKey') || '';
     const savedRequestUrl = localStorage.getItem('requestUrl') || '';
     const savedAuthPassword = localStorage.getItem('authPassword') || '';
-    const savedSessionMode = localStorage.getItem('sessionMode') as 'classic' | 'guided' || 'classic';
 
     setOpenaiApiKeyState(savedApiKey);
     setRequestUrlState(savedRequestUrl);
     setAuthPasswordState(savedAuthPassword);
-    setSessionModeState(savedSessionMode);
   }, []);
 
   const setOpenaiApiKey = (key: string) => {
@@ -65,11 +59,6 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     toast.success('Authentication password saved');
   };
 
-  const setSessionMode = (mode: 'classic' | 'guided') => {
-    setSessionModeState(mode);
-    localStorage.setItem('sessionMode', mode);
-  };
-
   const isSettingsComplete = Boolean(openaiApiKey && requestUrl && authPassword);
 
   return (
@@ -78,11 +67,9 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
         openaiApiKey,
         requestUrl,
         authPassword,
-        sessionMode,
         setOpenaiApiKey,
         setRequestUrl,
         setAuthPassword,
-        setSessionMode,
         isSettingsComplete,
       }}
     >

@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Volume2, VolumeX, Play, Square, Volume } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
 import { toast } from 'sonner';
+import { marked } from 'marked';
 
 interface ResponsePlayerProps {
   responseText: string;
@@ -31,7 +31,7 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = responseText;
       const textContent = tempDiv.textContent || '';
-      
+
       const response = await fetch('https://api.openai.com/v1/audio/speech', {
         method: 'POST',
         headers: {
@@ -52,7 +52,7 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
       const audioBlob = await response.blob();
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
-      
+
       // Auto-play the audio
       const audio = new Audio(url);
       audioRef.current = audio;
@@ -81,39 +81,29 @@ const ResponsePlayer: React.FC<ResponsePlayerProps> = ({ responseText }) => {
 
   const stopPlayback = () => {
     if (!audioRef.current) return;
-    
+
     audioRef.current.pause();
     audioRef.current.currentTime = 0;
     setIsPlaying(false);
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 w-full max-w-md">
-      <div className="w-full px-4 py-2 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
-        <div className="text-max-light-grey markdown-content" dangerouslySetInnerHTML={{ __html: responseText }} />
+    <div className="flex flex-col items-center space-y-4 w-full max-w-2xl">
+      <div className="w-full px-6 py-4 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
+        <div className="text-max-light-grey markdown-content" dangerouslySetInnerHTML={{ __html: marked.parse(responseText) as string }} />
       </div>
 
       {audioUrl && (
         <div className="flex space-x-2">
           <Button
             variant="outline"
-            size="icon"
+            size="lg"
             onClick={togglePlayback}
             disabled={isFetching}
-            className="bg-max-yellow hover:bg-yellow-400 text-black"
+            className="bg-max-yellow hover:bg-yellow-400 text-black p-6"
           >
-            {isPlaying ? <Square size={16} /> : <Play size={16} />}
+            {isPlaying ? <Square size={24} /> : <Play size={24} />}
           </Button>
-          {isPlaying && (
-            <Button 
-              variant="outline"
-              size="icon"
-              onClick={stopPlayback}
-              className="bg-max-light-grey hover:bg-gray-300 text-black"
-            >
-              <Square size={16} />
-            </Button>
-          )}
         </div>
       )}
 

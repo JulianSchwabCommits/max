@@ -1,11 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Mic, MicOff } from 'lucide-react';
+import { Send, Mic, MicOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSettings } from '@/contexts/SettingsContext';
 import { toast } from 'sonner';
-import { marked } from 'marked';
 
 interface VoiceRecorderProps {
   onResponseReceived: (response: string) => void;
@@ -19,7 +17,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
 
@@ -32,23 +30,23 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setStream(mediaStream);
-      
+
       const mediaRecorder = new MediaRecorder(mediaStream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-      
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
-      
+
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         setAudioBlob(audioBlob);
         transcribeAudio(audioBlob);
       };
-      
+
       mediaRecorder.start();
       setIsRecording(true);
     } catch (error) {
@@ -61,7 +59,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      
+
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
         setStream(null);
@@ -76,12 +74,12 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
     }
 
     setIsTranscribing(true);
-    
+
     try {
       const formData = new FormData();
       formData.append('file', audioBlob);
       formData.append('model', 'gpt-4o-mini-transcribe');
-      
+
       const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
@@ -89,13 +87,13 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
         },
         body: formData
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error?.message || 'Failed to transcribe audio');
       }
-      
+
       setTranscription(data.text);
     } catch (error) {
       console.error('Error transcribing audio:', error);
@@ -117,7 +115,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
     }
 
     setIsProcessing(true);
-    
+
     try {
       const response = await fetch(requestUrl, {
         method: 'POST',
@@ -129,17 +127,27 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
           message: transcription
         })
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const responseData = await response.text();
-      
-      // Fix TypeScript error by using marked.parse as a synchronous function
-      const formattedResponse = marked.parse(responseData) as string;
-      
-      onResponseReceived(formattedResponse);
+
+      // Try to parse as JSON to handle the [{"output":"..."}] format
+      try {
+        const jsonData = JSON.parse(responseData);
+        if (Array.isArray(jsonData) && jsonData.length > 0 && jsonData[0].output) {
+          // Extract just the output value without the JSON wrapper
+          onResponseReceived(jsonData[0].output);
+        } else {
+          // If it's not in the expected format, pass the original text
+          onResponseReceived(responseData);
+        }
+      } catch (e) {
+        // If it's not valid JSON, use the raw text
+        onResponseReceived(responseData);
+      }
     } catch (error) {
       console.error('Error sending transcription:', error);
       toast.error('Error sending your message. Please check your settings and try again.');
@@ -168,27 +176,33 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
     <div className="flex flex-col items-center justify-center space-y-8">
       <div
         className={cn(
-          "w-32 h-32 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-md",
-          isRecording 
-            ? "bg-red-500 animate-pulse-gentle" 
-            : "bg-max-yellow hover:bg-yellow-400"
+          "w-40 h-40 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-lg",
+          isRecording
+            ? "bg-red-500 animate-pulse-gentle"
+            : isProcessing
+              ? "bg-max-yellow animate-pulse-ring"
+              : "bg-max-yellow hover:bg-yellow-400"
         )}
-        onMouseDown={handleCircleMouseDown}
-        onMouseUp={handleCircleMouseUp}
-        onMouseLeave={isRecording ? handleCircleMouseUp : undefined}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onMouseDown={!isProcessing ? handleCircleMouseDown : undefined}
+        onMouseUp={!isProcessing ? handleCircleMouseUp : undefined}
+        onMouseLeave={!isProcessing && isRecording ? handleCircleMouseUp : undefined}
+        onTouchStart={!isProcessing ? handleTouchStart : undefined}
+        onTouchEnd={!isProcessing ? handleTouchEnd : undefined}
       >
         {isRecording ? (
-          <MicOff className="w-12 h-12 text-white" />
+          <MicOff className="w-16 h-16 text-white" />
+        ) : isProcessing ? (
+          <div className="relative">
+            <Loader2 className="w-16 h-16 text-white animate-spin" />
+          </div>
         ) : (
-          <Mic className="w-12 h-12 text-white" />
+          <Mic className="w-16 h-16 text-white" />
         )}
       </div>
 
       {/* Transcription display */}
       {(transcription || isTranscribing) && (
-        <div className="w-full max-w-md px-4 py-2 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
+        <div className="w-full max-w-xl px-4 py-2 rounded-lg bg-max-light-grey bg-opacity-20 backdrop-blur-sm">
           <p className="text-max-light-grey text-center">
             {isTranscribing ? "Transcribing..." : transcription}
           </p>
@@ -197,16 +211,19 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onResponseReceived }) => 
 
       {/* Send button */}
       {transcription && !isProcessing && (
-        <Button 
+        <Button
           onClick={sendTranscription}
           className="bg-max-yellow hover:bg-yellow-400 text-black"
+          size="lg"
         >
-          <Send className="mr-2 h-4 w-4" /> Send
+          <Send className="mr-2 h-5 w-5" /> Send
         </Button>
       )}
 
       {isProcessing && (
-        <div className="text-max-light-grey">Processing request...</div>
+        <div className="text-max-light-grey text-center text-lg">
+          Processing request...
+        </div>
       )}
     </div>
   );

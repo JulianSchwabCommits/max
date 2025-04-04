@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Settings, X } from 'lucide-react';
 import {
@@ -12,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useSettings } from '@/contexts/SettingsContext';
 
 const SettingsPanel: React.FC = () => {
@@ -20,24 +18,20 @@ const SettingsPanel: React.FC = () => {
     openaiApiKey,
     requestUrl,
     authPassword,
-    sessionMode,
     setOpenaiApiKey,
     setRequestUrl,
-    setAuthPassword,
-    setSessionMode
+    setAuthPassword
   } = useSettings();
 
   const [tempApiKey, setTempApiKey] = useState(openaiApiKey);
   const [tempRequestUrl, setTempRequestUrl] = useState(requestUrl);
   const [tempAuthPassword, setTempAuthPassword] = useState(authPassword);
-  const [tempSessionMode, setTempSessionMode] = useState<'classic' | 'guided'>(sessionMode);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSaveSettings = () => {
     setOpenaiApiKey(tempApiKey);
     setRequestUrl(tempRequestUrl);
     setAuthPassword(tempAuthPassword);
-    setSessionMode(tempSessionMode);
     setIsOpen(false);
   };
 
@@ -70,7 +64,7 @@ const SettingsPanel: React.FC = () => {
               placeholder="sk-..."
             />
           </div>
-          
+
           <div className="grid gap-2">
             <Label htmlFor="requestUrl">Request URL</Label>
             <Input
@@ -80,7 +74,7 @@ const SettingsPanel: React.FC = () => {
               placeholder="https://your-api-endpoint.com"
             />
           </div>
-          
+
           <div className="grid gap-2">
             <Label htmlFor="authPassword">Authentication Password</Label>
             <Input
@@ -90,23 +84,6 @@ const SettingsPanel: React.FC = () => {
               onChange={(e) => setTempAuthPassword(e.target.value)}
               placeholder="Your password"
             />
-          </div>
-
-          <div className="grid gap-2">
-            <Label>Session Mode</Label>
-            <RadioGroup
-              value={tempSessionMode}
-              onValueChange={(value) => setTempSessionMode(value as 'classic' | 'guided')}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="classic" id="classic" />
-                <Label htmlFor="classic">Classic</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="guided" id="guided" />
-                <Label htmlFor="guided">Guided</Label>
-              </div>
-            </RadioGroup>
           </div>
         </div>
         <div className="flex justify-end">
