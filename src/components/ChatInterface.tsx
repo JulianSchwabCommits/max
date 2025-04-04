@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -28,7 +27,7 @@ const ChatInterface: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full w-full max-w-2xl mx-auto relative overflow-hidden rounded-xl border border-border">
-      <header className="p-6 text-center relative">
+      <header className="sticky-header p-4 text-center relative">
         <h1 className="text-2xl font-semibold text-white">Ask Max Anything!</h1>
         <SettingsButton onClick={() => setIsSettingsOpen(true)} />
       </header>
@@ -46,7 +45,7 @@ const ChatInterface: React.FC = () => {
           ))
         )}
         {isLoading && (
-          <div className="py-3 px-4 rounded-2xl bg-secondary max-w-[80%] mr-auto rounded-bl-sm">
+          <div className="py-3 px-4 rounded-2xl bg-secondary max-w-[80%] mr-auto">
             <div className="flex space-x-2">
               <div className="w-2 h-2 rounded-full bg-apple-gray animate-pulse" />
               <div className="w-2 h-2 rounded-full bg-apple-gray animate-pulse" style={{ animationDelay: '0.2s' }} />

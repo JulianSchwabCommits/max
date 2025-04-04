@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, KeyboardEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-react';
@@ -32,7 +31,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
   return (
     <div className="flex items-end gap-2 p-4 border-t border-border bg-apple-black rounded-b-xl">
       <textarea
-        className="flex-1 bg-secondary h-12 max-h-32 rounded-2xl px-4 py-3 resize-none text-sm outline-none border border-border focus:border-apple-blue transition-colors"
+        className="flex-1 bg-secondary h-12 max-h-32 rounded-full consistent-padding resize-none text-sm outline-none border border-border focus:border-apple-blue transition-colors"
         placeholder="Type your message..."
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
@@ -43,7 +42,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, isLoading }) => {
       <Button
         size="icon"
         className={cn(
-          "rounded-full bg-apple-blue hover:bg-apple-blue/90 text-white",
+          "pill-shape bg-apple-blue hover:bg-apple-blue/90 text-white h-12 w-12",
           isLoading && "opacity-50 cursor-not-allowed"
         )}
         onClick={handleSubmit}

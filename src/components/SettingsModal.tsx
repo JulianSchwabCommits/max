@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -51,7 +50,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               placeholder="https://api.example.com/chat"
               value={apiUrl}
               onChange={(e) => setApiUrl(e.target.value)}
-              className="bg-secondary border-border text-white"
+              className="bg-secondary border-border text-white rounded-full consistent-padding"
             />
             <p className="text-xs text-muted-foreground">
               Enter the URL for the chat API endpoint
@@ -65,7 +64,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               placeholder="••••••••"
               value={authPassword}
               onChange={(e) => setAuthPassword(e.target.value)}
-              className="bg-secondary border-border text-white"
+              className="bg-secondary border-border text-white rounded-full consistent-padding"
             />
             <p className="text-xs text-muted-foreground">
               Optional: Password used for authentication header
@@ -73,14 +72,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button 
+          <Button
             variant="destructive"
             onClick={onClearChat}
             className="w-full sm:w-auto"
           >
             Clear Chat
           </Button>
-          <Button 
+          <Button
             onClick={handleSave}
             className="w-full sm:w-auto bg-apple-blue hover:bg-apple-blue/90 text-white"
           >

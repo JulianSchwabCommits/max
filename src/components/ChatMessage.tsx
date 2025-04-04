@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { Message } from '@/hooks/useChat';
@@ -10,20 +9,20 @@ interface ChatMessageProps {
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.role === 'user';
-  
+
   return (
-    <div 
+    <div
       className={cn(
-        'py-3 px-4 rounded-2xl max-w-[80%] animate-slide-up',
-        isUser 
-          ? 'bg-apple-blue text-white ml-auto rounded-br-sm' 
-          : 'bg-secondary text-white mr-auto rounded-bl-sm'
+        'consistent-padding rounded-2xl max-w-[80%] animate-slide-up',
+        isUser
+          ? 'bg-apple-blue text-white ml-auto'
+          : 'bg-secondary text-white mr-auto'
       )}
     >
       {isUser ? (
         <p className="text-sm">{message.content}</p>
       ) : (
-        <div 
+        <div
           className="markdown"
           dangerouslySetInnerHTML={{ __html: renderMarkdown(message.content) }}
         />
