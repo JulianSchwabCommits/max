@@ -18,7 +18,7 @@ const Main: React.FC = () => {
 
       {!isSettingsComplete ? (
         <div className="flex flex-col items-center justify-center space-y-8 animate-in fade-in duration-700 w-full max-w-2xl">
-          <h1 className="text-4xl font-bold text-max-light-grey">Welcome to Max Speech</h1>
+          <h1 className="text-4xl font-bold text-max-light-grey">Ask Max Anything!</h1>
           <p className="text-xl text-max-light-grey opacity-80 max-w-xl text-center">
             Press and hold the yellow circle to ask Max anything, then press 'Send' when you're ready.
           </p>
